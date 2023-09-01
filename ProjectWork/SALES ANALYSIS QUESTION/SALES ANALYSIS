@@ -1,0 +1,104 @@
+PROJECT NAME: SALES ANALYSIS
+DATA_USED: ENTITY RELATED DATA
+SERVER: AZURE(SQL_SERVER)
+
+QUESTION 1:
+
+For each account, determine the average amount of each type of paper they purchased across their orders. Your result should have four columns - one for the account name and one for the average quantity purchased for each of the paper types for each account. 
+
+ANSWER:
+
+SELECT a.name, AVG(o.standard_qty) AS Average_Standard, AVG(o.gloss_qty) AS AVG_Gloss, AVG(o.poster_qty) AS AVG_Poster
+FROM accounts a 
+JOIN orders o 
+ON a.id = o.account_id
+GROUP BY a.name
+
+
+QUESTION 2:
+
+For each account, determine the average amount spent per order on each paper type. Your result should have four columns - one for the account name and one for the average amount spent on each paper type
+
+ANSWER:
+
+SELECT a.name, AVG(o.standard_amt_usd) AS Average_Standard, AVG(o.gloss_amt_usd) AS AVG_Gloss, AVG(o.poster_amt_usd) AS AVG_Poster
+FROM accounts a 
+JOIN orders o 
+ON a.id = o.account_id
+GROUP BY a.name
+
+
+QUESTION 3:
+
+How many accounts have more than 20 orders?
+
+ANSWER:
+
+SELECT a.name, Count(*) AS Total_Order
+FROM accounts a 
+JOIN orders o 
+ON a.id = o.account_id
+GROUP BY a.name 
+HAVING Count(*) > 20
+ORDER BY a.name 
+
+
+QUESTION 4:
+
+Which accounts spent more than 30,000 usd total across all orders?
+
+ANSWER:
+
+SELECT a.name, SUM(total_amt_usd) AS Total_Amount
+FROM accounts a 
+JOIN orders o 
+ON a.id = o.account_id
+GROUP BY a.name
+HAVING SUM(total_amt_usd) > 30000  
+ORDER BY SUM(total_amt_usd) DESC
+
+
+QUESTION 5:
+
+Which account has spent the least with us?
+
+ANSWER:
+
+
+SELECT TOP(1)*
+FROM
+    (SELECT a.name AS Account_Name, SUM(total_amt_usd) AS Total_Amount
+    FROM accounts a 
+    JOIN orders o 
+    ON a.id = o.account_id 
+    GROUP BY a.name) T1
+
+
+QUESTION 6:
+
+Which accounts used facebook as a channel to contact customers more than 6 times?
+
+ANSWER:
+
+
+SELECT Count(w.channel) AS Use_Of_Channel, w.channel , a.name 
+FROM web_events w 
+JOIN accounts a 
+ON w.account_id = a.id 
+GROUP BY  a.name, w.channel 
+HAVING w.channel = 'facebook' AND Count(w.channel) > 6
+ORDER BY Count(w.channel) DESC
+
+QUESTION 7:
+
+Which channel was frequently use by most accounts?
+
+ANSWER:
+
+
+SELECT Count(w.channel) AS Use_Of_Channel, w.channel , a.name 
+FROM web_events w 
+JOIN accounts a 
+ON w.account_id = a.id 
+GROUP BY  a.name, w.channel 
+ORDER BY Count(w.channel) DESC
